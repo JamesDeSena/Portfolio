@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Projects = () => {
   const projectData = [
@@ -9,7 +9,7 @@ const Projects = () => {
                     Google Gemini API for data translation, employing a caching system 
                     for efficiency.`,
       github: 'https://github.com/JamesDeSena/WebScrape',
-      live: 'https://gdsbooking.netlify.app/',
+      live: 'https://pdmnnewshub.netlify.app/',
     },
     {
       title: 'Booking System',
@@ -19,7 +19,7 @@ const Projects = () => {
                     generation. Utilized JSON Web Tokens and bcrypt.js for secure 
                     authentication. Integrated Socket.io for real-time notifications on bookings.`,
       github: 'https://github.com/JamesDeSena/booking-system',
-      live: 'https://pdmnnewshub.netlify.app/',
+      live: 'https://gdsbooking.netlify.app/',
     },
     {
       title: 'Blog Website',
@@ -41,6 +41,24 @@ const Projects = () => {
     },
   ];
 
+  const [expandedIndex, setExpandedIndex] = useState(null);
+
+  // Toggle function for expanding/collapsing project details
+  const toggleProject = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <section
       id="projects"
@@ -53,39 +71,66 @@ const Projects = () => {
         Here are some of my recent projects.
       </p>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl">
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-8 max-w-4xl`}>
         {projectData.map((project, index) => (
-          <div
-            key={index}
-            className="flex flex-col justify-between bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200 h-full"
-          >
-            <div>
+          <div key={index} className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col">
+
+            <div className="flex justify-between items-center cursor-pointer" onClick={isMobile ? () => toggleProject(index) : undefined}>
               <h2 className="text-xl md:text-2xl font-bold mb-2 uppercase">
                 {project.title}
               </h2>
+              {isMobile && (
+                <span className="text-gray-600">{expandedIndex === index ? '−' : '+'}</span>
+              )}
+            </div>
+
+            <div className={`flex-grow ${!isMobile || expandedIndex === index ? 'block' : 'hidden'}`}>
               <p className="text-sm md:text-base text-gray-600 text-justify mb-4">
                 {project.description}
               </p>
+              
+              {isMobile && (
+                <div className="flex items-center justify-around w-full mt-4"> 
+                  <a
+                    href={project.github}
+                    className="bg-gray-600 text-white font-semibold py-2 px-5 rounded-md transition-colors duration-300 hover:bg-gray-700"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    GitHub
+                  </a>
+                  <a
+                    href={project.live}
+                    className="bg-gray-600 text-white font-semibold py-2 px-7 rounded-md transition-colors duration-300 hover:bg-gray-700"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Live
+                  </a>
+                </div>
+              )}
             </div>
-            <div className="flex items-end justify-around w-full mt-4"> {/* Button container at the bottom */}
-              <a
-                href={project.github}
-                className="bg-gray-600 text-white font-semibold py-2 px-5 rounded-md transition-colors duration-300 hover:bg-gray-700"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub
-              </a>
-              <a
-                href={project.live}
-                className="bg-gray-600 text-white font-semibold py-2 px-7 rounded-md transition-colors duration-300 hover:bg-gray-700"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Live
-              </a>
-            </div>
+
+            {!isMobile && ( 
+              <div className="flex items-center justify-around w-full mt-4"> 
+                <a
+                  href={project.github}
+                  className="bg-gray-600 text-white font-semibold py-2 px-5 rounded-md transition-colors duration-300 hover:bg-gray-700"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub
+                </a>
+                <a
+                  href={project.live}
+                  className="bg-gray-600 text-white font-semibold py-2 px-7 rounded-md transition-colors duration-300 hover:bg-gray-700"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Live
+                </a>
+              </div>
+            )}
           </div>
         ))}
       </div>
