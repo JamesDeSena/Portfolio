@@ -13,6 +13,7 @@ const Home = () => {
   });
 
   const [currentSection, setCurrentSection] = useState('about'); // Default to 'about'
+  const [showScrollIndicators, setShowScrollIndicators] = useState(false); // New state for scroll indicators
   const sectionOrder = ['about', 'projects', 'skills', 'contacts']; // Define section order
 
   const toggleTheme = () => {
@@ -44,14 +45,6 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const isBrowserSupported = () => 'fetch' in window && 'Promise' in window;
-
-    if (!isBrowserSupported()) {
-      console.warn('Warning: You are using an unsupported browser. Please update to the latest version for the best experience.');
-    }
-  }, []);
-
-  useEffect(() => {
     const sections = document.querySelectorAll('section');
     const options = {
       root: null, // use the viewport as the root
@@ -61,7 +54,11 @@ const Home = () => {
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setCurrentSection(entry.target.id);
+          setShowScrollIndicators(false); // Hide indicators immediately on section change
+          setTimeout(() => {
+            setCurrentSection(entry.target.id);
+            setShowScrollIndicators(true); // Show indicators after 500ms
+          }, 300);
         }
       });
     };
@@ -76,19 +73,20 @@ const Home = () => {
     };
   }, []);
 
-  // Scroll Navigation using Arrow Keys
   const handleKeyDown = (event) => {
     const currentIndex = sectionOrder.indexOf(currentSection);
     if (event.key === 'ArrowDown') {
       if (currentIndex < sectionOrder.length - 1) {
         const nextSection = sectionOrder[currentIndex + 1];
         setCurrentSection(nextSection);
+        setShowScrollIndicators(false); // Hide indicators immediately
         document.getElementById(nextSection).scrollIntoView({ behavior: 'smooth' });
       }
     } else if (event.key === 'ArrowUp') {
       if (currentIndex > 0) {
         const prevSection = sectionOrder[currentIndex - 1];
         setCurrentSection(prevSection);
+        setShowScrollIndicators(false); // Hide indicators immediately
         document.getElementById(prevSection).scrollIntoView({ behavior: 'smooth' });
       }
     }
@@ -102,8 +100,9 @@ const Home = () => {
     };
   }, [currentSection]);
 
-  // Scroll Indicator Rendering
   const renderScrollIndicator = () => {
+    if (!showScrollIndicators) return null; // Only render if true
+
     switch (currentSection) {
       case 'about':
         return (
@@ -219,13 +218,12 @@ const Home = () => {
         aria-label="Toggle Theme"
       >
         <img
-          src={
-            isDarkMode
-              ? 'https://img.icons8.com/?size=100&id=648&format=png&color=FFFFFF'
-              : 'https://img.icons8.com/?size=100&id=26031&format=png&color=000000'
+          src={isDarkMode
+            ? 'https://img.icons8.com/?size=100&id=648&format=png&color=FFFFFF'
+            : 'https://img.icons8.com/?size=100&id=26031&format=png&color=000000'
           }
-          alt={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="w-8 h-8"
+          alt="Theme Toggle Icon"
+          className="w-6 h-6"
         />
       </button>
     </div>
